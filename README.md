@@ -7,15 +7,15 @@ https://arxiv.org/abs/2101.12720
 
 ## Installation
 ```
-pip install principal-feature-analysis
+pip install parallel-principal-feature-analysis
 ```
 
 ## Usage
 
 ```Python
-from principal_feature_analysis import pfa # import the main pfa function
+from parallel_principal_feature_analysis import par_pfa # import the main pfa function
 
-pfa(path*, number_output_functions, number_sweeps, cluster_size, alpha, min_n_datapoints_a_bin, shuffle_feature_numbers, frac, claculate_mutual_information, basis_log_mutual_information) # function call
+par_pfa(path*, number_output_functions, number_sweeps, cluster_size, alpha, min_n_datapoints_a_bin, shuffle_feature_numbers, frac, claculate_mutual_information, basis_log_mutual_information) # function call
 ```
 
 ### Parameters
@@ -49,5 +49,5 @@ A csv file where for each sweep [i] the first column is the feature number refer
 ## Advanced
 The principal_feature_analysis package also grants access to other functions used for the principal component analysis algorithm. In case you want to access those you can import them like this.
 ```Python
-from principal_feature_analysis import find_relevant_principal_features, get_mutual_information, principal_feature_analysis
+from parallel_principal_feature_analysis import find_relevant_principal_features, get_mutual_information, principal_feature_analysis
 ```
