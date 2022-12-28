@@ -89,36 +89,35 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
 
 
                 idx = 0
-                set_nodes_to_delete = []
-                
+    
                 set_nodes_to_delete = pool.map(nx.minimum_node_cut, list_graphs_to_divide)
                 assert len(set_nodes_to_delete) == len(list_graphs_to_divide)
         
-        
                 global_list_graphs_to_divide = list_graphs_to_divide.copy()
-                window = len(list_graphs_to_divide)
-                while list_graphs_to_divide!=[]:
+                window = len(set_nodes_to_delete)
+                
+                if list_graphs_to_divide!=[]:
                     any_cluster_dissected=1
                     
-                    for current_graph in list_graphs_to_divide:
-                        print(str(len(set_nodes_to_delete[idx])) + " nodes removed!")
-                        list_graphs_to_divide.remove(current_graph)  
-                        for node in list(set_nodes_to_delete[idx]):
-                            current_graph.remove_node(node)                     # remove the nodes that were found with the minimum cut algorithm
-                        list_new_sub_graphs = [current_graph.subgraph(c).copy() for c in nx.connected_components(current_graph)]
-                        # Sort the new subgraphs into a list of complete subgraphs and subgraphs that can be further divided
-                        for sub_graph_of_current_graph in list_new_sub_graphs:
-                            if list(nx.complement(sub_graph_of_current_graph).edges)!=[]:
-                                list_graphs_to_divide.append(sub_graph_of_current_graph)
-                                global_list_graphs_to_divide.append(sub_graph_of_current_graph)
-                            else:
-                                list_complete_sub_graphs.append(sub_graph_of_current_graph)
-                                list_nodes_complete_sub_graphs.append(list(sub_graph_of_current_graph.nodes))
-                        idx += 1
-                        
-                        if idx >= window:
-                            window = len(set_nodes_to_delete)
-                            set_nodes_to_delete += pool.map(nx.minimum_node_cut, global_list_graphs_to_divide[idx:])
+                for current_graph in list_graphs_to_divide:
+                    print(str(len(set_nodes_to_delete[idx])) + " nodes removed!")
+                    
+                    for node in list(set_nodes_to_delete[idx]):
+                        current_graph.remove_node(node)                     # remove the nodes that were found with the minimum cut algorithm
+                    list_new_sub_graphs = [current_graph.subgraph(c).copy() for c in nx.connected_components(current_graph)]
+                    # Sort the new subgraphs into a list of complete subgraphs and subgraphs that can be further divided
+                    for sub_graph_of_current_graph in list_new_sub_graphs:
+                        if list(nx.complement(sub_graph_of_current_graph).edges)!=[]:
+                            list_graphs_to_divide.append(sub_graph_of_current_graph)
+                            global_list_graphs_to_divide.append(sub_graph_of_current_graph)
+                        else:
+                            list_complete_sub_graphs.append(sub_graph_of_current_graph)
+                            list_nodes_complete_sub_graphs.append(list(sub_graph_of_current_graph.nodes))
+                    idx += 1
+                    
+                    if idx >= window:
+                        set_nodes_to_delete += pool.map(nx.minimum_node_cut, global_list_graphs_to_divide[idx:])
+                        window = len(set_nodes_to_delete)
                             
                 
                 
