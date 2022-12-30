@@ -4,7 +4,7 @@ If you use the presented PFA method or the provided Python scripts inspired you 
 
 https://arxiv.org/abs/2101.12720
 
-
+The original version of the algorithm can be found here: https://github.com/LauritzR/Principal-Feature-Analysis
 ## Installation
 ```
 pip install parallel-principal-feature-analysis
