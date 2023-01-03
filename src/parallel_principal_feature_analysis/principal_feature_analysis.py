@@ -19,7 +19,7 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
     global_adjm=np.zeros((m,m)) # global adjacency matrix
     is_entry_calculated=np.zeros((m,m)) # flag if the corresponding entry of the global adjacency matrix is already calculated
 
-    with Pool() as pool:
+    with Pool() as pool: # initialize pool with maximum number of processes
         while(True):
             print("Nodes left: " + str(number_nodes))
             list_of_clusters=[]
@@ -88,14 +88,15 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
                         list_nodes_complete_sub_graphs.append(list(i.nodes))
 
 
-                idx = 0
-    
-                set_nodes_to_delete = pool.map(nx.minimum_node_cut, list_graphs_to_divide)
+                
+                set_nodes_to_delete = pool.map(nx.minimum_node_cut, list_graphs_to_divide) # calculate initial set_nodes_to_delete in parallel
                 assert len(set_nodes_to_delete) == len(list_graphs_to_divide)
         
                 global_list_graphs_to_divide = list_graphs_to_divide.copy()
-                window = len(set_nodes_to_delete)
+                window = len(set_nodes_to_delete) # window = at which index do we have to calculate the next set_nodes_to_delete
+                idx = 0 # index for keeping track of set_nodes_to_delete and global_list_graphs_to_divide
                 
+                # if no graphs to divide left, set flag to abort
                 if list_graphs_to_divide!=[]:
                     any_cluster_dissected=1
                     
@@ -114,10 +115,10 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
                             list_complete_sub_graphs.append(sub_graph_of_current_graph)
                             list_nodes_complete_sub_graphs.append(list(sub_graph_of_current_graph.nodes))
                     idx += 1
-                    
-                    if idx >= window:
+                   
+                    if idx >= window: # if true, calculate next batch of set_nodes_to_delete in parallel
                         set_nodes_to_delete += pool.map(nx.minimum_node_cut, global_list_graphs_to_divide[idx:])
-                        window = len(set_nodes_to_delete)
+                        window = len(set_nodes_to_delete) # adjust window
                             
                 
                 
