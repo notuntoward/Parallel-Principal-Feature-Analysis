@@ -18,6 +18,12 @@ from parallel_principal_feature_analysis import par_pfa # import the main pfa fu
 par_pfa(path*, number_output_functions, number_sweeps, cluster_size, alpha, min_n_datapoints_a_bin, shuffle_feature_numbers, frac, claculate_mutual_information, basis_log_mutual_information) # function call
 ```
 
+When calling the function on Windows make sure to call it like this for the parallelization to work:
+```Python
+if __name__ == "__main__":
+  par_pfa(path*, number_output_functions, number_sweeps, cluster_size, alpha, min_n_datapoints_a_bin, shuffle_feature_numbers, frac, claculate_mutual_information, basis_log_mutual_information) # function call
+```
+
 ### Parameters
 - **path (String, required):** Path to the input CSV file.
 - **number_output_functions (int, default=1):** Number of output features that are to be modeled, i.e. the number of components of the vector-valued output-function. The values are stored in the first number_output_functions rows of the csv-file.
