@@ -58,14 +58,19 @@ def par_pfa(path, number_output_functions=1, number_sweeps=1, cluster_size=50, a
     #Intersect the lists of principal features related to the output function
     #All the features corresponding to the returned subgraphs are considered in each list
 
-    pf_from_intersection=list_pf[0]
+    list_principal_features_depending_on_system_state_for_intersection=[]
+    for i in list_pf_ds:
+        intermediate_list = []
+        for j in i:
+            for k in j:
+                if k !='*':
+                    intermediate_list.append(k)
+        list_principal_features_depending_on_system_state_for_intersection.append(intermediate_list)
+    pf_from_intersection=list_principal_features_depending_on_system_state_for_intersection[0]
     if number_sweeps > 1:
-        for i in range(1, len(list_pf)):
-            pf_from_intersection=list(set(pf_from_intersection).intersection(set(list_pf[i])))
-        f = open("principal_features_intersection.txt", "w")
-        for i in pf_from_intersection:
-            f.write(str(i)+str(","))
-        f.close()
+        for i in range(1, len(list_principal_features_depending_on_system_state_for_intersection)):
+            pf_from_intersection=list(set(pf_from_intersection).intersection(set(list_principal_features_depending_on_system_state_for_intersection[i])))
+        f = open("principal_features_depending_system_state_intersection.txt", "w")
 
     # Outputs a list of DataFrames where the index feature refers to the row in the csv-file.
     # The mutual information is calculated between the feature represented in the first row of the data frame and the feature referred to in the index feature column.
