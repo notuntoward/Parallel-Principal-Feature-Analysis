@@ -24,8 +24,7 @@ def get_mutual_information(data,number_output_functions,list_variables,min_n_dat
     for i in range(0,number_output_functions):
         list_variables.insert(i,i)
 
-    data_init = data.to_numpy()
-    data=data_init[list_variables,:]
+    data=data[list_variables,:]
     m = data.shape[0]
     n = data.shape[1]
     l = [0 for i in range(0, m)]

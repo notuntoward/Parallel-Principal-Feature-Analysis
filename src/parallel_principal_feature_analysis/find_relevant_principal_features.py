@@ -9,7 +9,6 @@ def find_relevant_principal_features(data,number_output_functions,cluster_size,a
     # In this function the binning is done, the graph is dissected and the relevant features/variables are detected
     if frac<1: # if frac<1 the feature analysis is done only the fraction of the data, randomly sampled
         data=data.sample(frac=frac,axis='columns',replace=False)
-    data=data.to_numpy()
     m = data.shape[0] #number features
     n = data.shape[1] #number of data points
     l = [0 for i in range(0, m)]  # list of lists with the points of support for the binning

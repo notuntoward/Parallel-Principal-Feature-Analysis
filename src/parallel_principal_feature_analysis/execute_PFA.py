@@ -8,7 +8,8 @@ import pandas as pd
 import numpy as np
 
 
-# paramters for the PFA
+# parameters for the PFA
+# data: np.array() of shape (m,n): m = number features; n = number of data points
 # number_output_functions: Number of output features that are to be modeled, i.e. the number of components of the vector-valued output-function. The values are stored in the first number_output_functions rows of the csv-file.
 # number_sweeps: Number of sweeps of the PFA. The result of the last sweep is returned.
                 # In addition, the return of each sweep are interesected and returned as well.
@@ -23,7 +24,7 @@ import numpy as np
 
 
 
-def par_pfa(path, number_output_functions=1, number_sweeps=1, cluster_size=50, alpha=0.01, min_n_datapoints_a_bin=500, shuffle_feature_numbers=0, frac=1, calculate_mutual_information=0, basis_log_mutual_information=2):
+def par_pfa(data, number_output_functions=1, number_sweeps=1, cluster_size=50, alpha=0.01, min_n_datapoints_a_bin=500, shuffle_feature_numbers=0, frac=1, calculate_mutual_information=0, basis_log_mutual_information=2):
     # pf_ds = principal features related to output functions, pf = all principal features
     start_time=time.time()
     list_pf_ds=[]
@@ -32,12 +33,11 @@ def par_pfa(path, number_output_functions=1, number_sweeps=1, cluster_size=50, a
     # The csv file's content is an m x n Matrix with m - number components of output-function = number features and n = number of data points
     # where the first number components of output-function rows contain the value of the vector-valued output function for each of the n data points
     # e.g. in case of a one-dimensional output function, the first row can be the label for each data point
-    data = pd.read_csv(path, sep=',', header=None)
     for sweep in range(0,number_sweeps):
         print("Sweep number: " + str(sweep+1))
         pf_ds,pf,indices_principal_feature_values=find_relevant_principal_features(data,number_output_functions,cluster_size,alpha,min_n_datapoints_a_bin,shuffle_feature_numbers,frac)
         list_pf_ds.append(pf_ds)
-        # Output the principal features related to the output function in a list where the numbers correspod to the rows of the input csv-file
+        # Output the principal features related to the output function in a list where the numbers correspond to the rows of the input csv-file
         f = open("principal_features_depending_system_state"+str(sweep)+".txt", "w")
         for i in pf_ds:
             for j in i:
