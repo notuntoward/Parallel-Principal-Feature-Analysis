@@ -5,7 +5,7 @@ import scipy.stats
 import pandas as pd
 from .principal_feature_analysis import principal_feature_analysis
 
-def find_relevant_principal_features(data,number_output_functions,cluster_size,alpha,min_n_datapoints_a_bin,shuffle_feature_numbers,frac):
+def find_relevant_principal_features(data,number_output_functions,cluster_size,alpha,min_n_datapoints_a_bin,shuffle_feature_numbers,frac, verbose=-1):
     # In this function the binning is done, the graph is dissected and the relevant features/variables are detected
     if frac<1: # if frac<1 the feature analysis is done only the fraction of the data, randomly sampled
         data=data.sample(frac=frac,axis='columns',replace=False)
@@ -49,14 +49,18 @@ def find_relevant_principal_features(data,number_output_functions,cluster_size,a
                     list_points_of_support.pop(-2)
             l[i] = list_points_of_support
             freq_data[i] = np.histogram(data[i, :], bins=l[i])[0]
-    print("Binning done!")
-    print("List of features with constant values:")
-    print(constant_features)
+
+    if verbose > 0:
+        print("Binning done!")
+        print("List of features with constant values:")
+        print(constant_features)
+        
     for id_output in range(0,number_output_functions):
         if id_output in constant_features or len(freq_data[id_output]) < 2:  # Warn if the output function is constant e.g. due to an unsuitable binning
             print("Warning: System state " + str(id_output) +  " is constant!")
 
-    print("Starting principal feature analysis!")
+    if verbose > 0:
+        print("Starting principal feature analysis!")
     # list_principal_features = list of resulting principal features
     # smaller_than5 = percent of chi-square tests with bins less than 5 data points
     # smaller_than1 = percent of chi-square tests with bins less than 1 data point
@@ -71,13 +75,15 @@ def find_relevant_principal_features(data,number_output_functions,cluster_size,a
             intermediate_list.append(left_features[shift_variable])
         list_principal_features_global_indices.append(intermediate_list)
 
-    print('principal features:')
-    print(list_principal_features_global_indices)
+    if verbose > 0:
+        print('principal features:')
+        print(list_principal_features_global_indices)
 
 
 
     # identify principal features related to the output function again using chi-square
-    print("Start calculating dependence on system state")
+    if verbose > 0:
+        print("Start calculating dependence on system state")
     principal_features_depending_on_system_state=[]
     principal_features_not_depending_on_system_state = []
     counter_bins_less_than5_relevant_principal_features=0 # number of chi-square tests with less than 5 datapoints a bin
@@ -139,10 +145,13 @@ def find_relevant_principal_features(data,number_output_functions,cluster_size,a
                 # if a subgraph contains a node not independent of the output function and a node independent of the node, the classes of nodes are separated by *
                 intermediate_list_depending_on_system_state = intermediate_list_depending_on_system_state + ['*'] + intermediate_list_not_depending_on_system_state
             principal_features_depending_on_system_state.append(intermediate_list_depending_on_system_state)
-    print("principal features depending on system state:")
-    print(principal_features_depending_on_system_state)
-    print(str(smaller_than5) + "% of the chi-square test for the adjacency matrix have been performed with a bin less than 5 data points!")
-    print(str(smaller_than1) + "% of the chi-square test for the adjacency matrix have been performed with a bin less than 1 data points!")
-    print(str(counter_bins_less_than5_relevant_principal_features / counter_number_chi_square_tests_relevant_principal_features * 100) + "% of the chi-square test for finding the relevant principal features have been performed with a bin less than 5 data points!")
-    print(str(counter_bins_less_than1_relevant_principal_features / counter_number_chi_square_tests_relevant_principal_features * 100) + "% of the chi-square test for finding the relevant principal features have been performed with a bin less than 1 data points!")
+
+    if verbose > 0:
+        print("principal features depending on system state:")
+        print(principal_features_depending_on_system_state)
+        print(str(smaller_than5) + "% of the chi-square test for the adjacency matrix have been performed with a bin less than 5 data points!")
+        print(str(smaller_than1) + "% of the chi-square test for the adjacency matrix have been performed with a bin less than 1 data points!")
+        print(str(counter_bins_less_than5_relevant_principal_features / counter_number_chi_square_tests_relevant_principal_features * 100) + "% of the chi-square test for finding the relevant principal features have been performed with a bin less than 5 data points!")
+        print(str(counter_bins_less_than1_relevant_principal_features / counter_number_chi_square_tests_relevant_principal_features * 100) + "% of the chi-square test for finding the relevant principal features have been performed with a bin less than 1 data points!")
+        
     return principal_features_depending_on_system_state, list_principal_features_global_indices, indices_principal_feature_values

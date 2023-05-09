@@ -37,10 +37,42 @@ import numpy as np
 # list_data_frame_feature_mutual_information: (only if calculate_mutual_information==1)
 #                 This is the mutual information of each variable pf_from_intersection with the ouput variable(s).  The 2nd column is the variable(s) index into 'data'; the 3rd is the MI.
 
+ndef par_pfa_pd(X, y, number_output_functions=1, number_sweeps=1,
+               cluster_size=50, alpha=0.01, min_n_datapoints_a_bin=500,
+               shuffle_feature_numbers=0, frac=1, calculate_mutual_information=0,
+               basis_log_mutual_information=2, verbose=-1):
+
+    
+    """A pandas interface for par_pfa(), which does principal feature
+    analysis.  The parameter interface is the same as par_pfa(),
+    except that data is replaced by features, X, and predictand, y,
+    components, in standard pandas row/column orientation.
+
+    Inputs
+    X: the features from which to select small set of features relevant to y.
+    Each column is a variable, and each row is a point (pd.DataFrame)
+    y: each column is a variable to be predicted; each row is a point.  For a
+    scalar predictand, this can be a pd.Series; otherwise, a pd.DataFrame
+
+    The remaning inputs are the same as for par_pfa
+
+    Return: A tuplet, (pickedFeatNms, pfa_info), where pickedFeatNms
+    contains the names of the features chosen in X, and pfa_info is
+    the normal return of par_pfa() """
+
+    df = pd.concat([y, X], axis=1)
+
+    pfa_info = par_pfa(df.T.values, number_output_functions, number_sweeps,
+                       cluster_size, alpha, min_n_datapoints_a_bin,
+                       shuffle_feature_numbers, frac, calculate_mutual_information,
+                       basis_log_mutual_information, verbose)
+
+    pickedFeatNms = [df.columns[i] for i in pfa_info['pf_from_intersection']]
+                                
+    return pickedFeatNms, pfa_info
 
 
-
-def par_pfa(data, number_output_functions=1, number_sweeps=1, cluster_size=50, alpha=0.01, min_n_datapoints_a_bin=500, shuffle_feature_numbers=0, frac=1, calculate_mutual_information=0, basis_log_mutual_information=2):
+def par_pfa(data, number_output_functions=1, number_sweeps=1, cluster_size=50, alpha=0.01, min_n_datapoints_a_bin=500, shuffle_feature_numbers=0, frac=1, calculate_mutual_information=0, basis_log_mutual_information=2, verbose=-1):
     # pf_ds = principal features related to output functions, pf = all principal features
     start_time=time.time()
     list_pf_ds=[]
@@ -51,15 +83,17 @@ def par_pfa(data, number_output_functions=1, number_sweeps=1, cluster_size=50, a
     # e.g. in case of a one-dimensional output function, the first row can be the label for each data point
     sweep_history = []
     for sweep in range(0,number_sweeps):
-        print("Sweep number: " + str(sweep+1))
-        pf_ds,pf,indices_principal_feature_values=find_relevant_principal_features(data,number_output_functions,cluster_size,alpha,min_n_datapoints_a_bin,shuffle_feature_numbers,frac)
+        if verbose>0:
+            print("Sweep number: " + str(sweep+1))
+        pf_ds,pf,indices_principal_feature_values=find_relevant_principal_features(data,number_output_functions,cluster_size,alpha,min_n_datapoints_a_bin,shuffle_feature_numbers,frac,verbose)
         list_pf_ds.append(pf_ds)
 
         sweep_hist_this = dict(pf=pf.copy(), pf_ds=pf_ds.copy())
         sweep_hist_this['global_indices_and_principal_features_state_dependency'] = indices_principal_feature_values.copy()
         sweep_history.append(sweep_hist_this)
         
-    print("Time needed for the PFA in seconds: " + str(time.time()-start_time))
+    if verbose > 0:
+        print("Time needed for the PFA in seconds: " + str(time.time()-start_time))
 
 
     #Intersect the lists of principal features related to the output function
@@ -83,10 +117,12 @@ def par_pfa(data, number_output_functions=1, number_sweeps=1, cluster_size=50, a
     # The first row is consequently the mutual information of the corresponding component of the output-function with itself
     return_val = dict(pf_from_intersection=pf_from_intersection, sweep_history=sweep_history)
     if calculate_mutual_information==1:
-        print("Calculating mutual information")
-        list_data_frame_feature_mutual_information=get_mutual_information(data,number_output_functions,pf_from_intersection,min_n_datapoints_a_bin,basis_log_mutual_information)
-        for i in range(0,len(list_data_frame_feature_mutual_information)):
-            print(list_data_frame_feature_mutual_information[i])
+        if verbose > 0:
+            print("Calculating mutual information")
+        list_data_frame_feature_mutual_information=get_mutual_information(data,number_output_functions,pf_from_intersection,min_n_datapoints_a_bin,basis_log_mutual_information,verbose)
+        if verbose > 0:
+            for i in range(0,len(list_data_frame_feature_mutual_information)):
+                print(list_data_frame_feature_mutual_information[i])
 
         return_val['list_data_frame_feature_mutual_information'] = list_data_frame_feature_mutual_information
         

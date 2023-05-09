@@ -8,7 +8,7 @@ from multiprocessing import Pool
 
 
 # see paper Algorithm 2
-def principal_feature_analysis(cluster_size,data,number_output_functions,freq_data,l,left_features,alpha,shuffle_feature_numbers):
+def principal_feature_analysis(cluster_size,data,number_output_functions,freq_data,l,left_features,alpha,shuffle_feature_numbers, verbose=-1):
     number_nodes= len(left_features) - number_output_functions  # Subtract the number of components of the output function
     list_of_nodes= left_features[number_output_functions:].copy()  # Take only the features and not the components of the output function
     m= data.shape[0]    # number of rows of the data matrix
@@ -21,7 +21,8 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
 
     with Pool() as pool: # initialize pool with maximum number of processes
         while(True):
-            print("Nodes left: " + str(number_nodes))
+            if verbose > 0:
+                print("Nodes left: " + str(number_nodes))
             list_of_clusters=[]
             intermediate_list=[]
             if shuffle_feature_numbers==1:
@@ -105,7 +106,8 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
                     any_cluster_dissected=1
                     
                 for current_graph in list_graphs_to_divide:
-                    print(str(len(set_nodes_to_delete[idx])) + " nodes removed!")
+                    if verbose > 0:
+                        print(str(len(set_nodes_to_delete[idx])) + " nodes removed!")
                     
                     for node in list(set_nodes_to_delete[idx]):
                         current_graph.remove_node(node)                     # remove the nodes that were found with the minimum cut algorithm
@@ -136,6 +138,8 @@ def principal_feature_analysis(cluster_size,data,number_output_functions,freq_da
                 cluster_size=number_nodes
             if len(list_of_clusters)<=1:    # If the total graph of all features has been considered stop
                 break
-    print("Nodes left: " + str(number_nodes))
-    print('Dissection done!')
+    if verbose > 0:
+        print("Nodes left: " + str(number_nodes))
+        print('Dissection done!')
+        
     return list_nodes_complete_sub_graphs, counter_bin_less_than5 / number_chisquare_tests * 100, counter_bin_less_than1 / number_chisquare_tests * 100

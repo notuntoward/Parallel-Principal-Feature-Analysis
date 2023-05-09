@@ -12,7 +12,7 @@ import math
 # Output:   list_pd_mutual_information: list of pandas data frames where each the first column refers to the indices of the row in the csv (respectively, the variable of which the values are stored there) and the second column refers to the corresponding mutual information of the corresponding feature with the component of the output-function (indicated in the first row of first column)
 #                                  The first entry is the mutual information of the corresponding component of the output fuction with itself. The further entries are the mutual information of the corresponding row in the csv-file to the corresponding component of the output function
 
-def get_mutual_information(data,number_output_functions,list_variables,min_n_datapoints_a_bin,basis_log_mutual_information):
+def get_mutual_information(data,number_output_functions,list_variables,min_n_datapoints_a_bin,basis_log_mutual_information, verbose=-1):
     # Calulate the Shannon mutual information
     def make_summand_from_frequencies(x,y):
         if x == 0:
@@ -36,7 +36,8 @@ def get_mutual_information(data,number_output_functions,list_variables,min_n_dat
         mindata = min(data[i, :])
         maxdata = max(data[i, :])
         if maxdata <= mindata:
-            print("Feature #"f"{list_variables[i]}" " has only constant values")
+            if verbose > 0:
+                print("Feature #"f"{list_variables[i]}" " has only constant values")
             left_features.remove(i)
             constant_features.append(list_variables[i])
         else:
@@ -67,7 +68,7 @@ def get_mutual_information(data,number_output_functions,list_variables,min_n_dat
 
 
     #Check for constant features
-    if constant_features != []:
+    if verbose > 0 and constant_features != []:
         print("List of features with constant values:")
         print(constant_features)
     for id_output in range(0,number_output_functions):
