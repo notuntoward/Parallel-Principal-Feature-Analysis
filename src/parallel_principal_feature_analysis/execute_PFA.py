@@ -37,7 +37,7 @@ import numpy as np
 # list_data_frame_feature_mutual_information: (only if calculate_mutual_information==1)
 #                 This is the mutual information of each variable pf_from_intersection with the ouput variable(s).  The 2nd column is the variable(s) index into 'data'; the 3rd is the MI.
 
-ndef par_pfa_pd(X, y, number_output_functions=1, number_sweeps=1,
+def par_pfa_pd(X, y, number_output_functions=1, number_sweeps=1,
                cluster_size=50, alpha=0.01, min_n_datapoints_a_bin=500,
                shuffle_feature_numbers=0, frac=1, calculate_mutual_information=0,
                basis_log_mutual_information=2, verbose=-1):
