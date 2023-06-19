@@ -67,7 +67,7 @@ def par_pfa_pd(X, y, number_output_functions=1, number_sweeps=1,
                        shuffle_feature_numbers, frac, calculate_mutual_information,
                        basis_log_mutual_information, verbose)
 
-    pickedFeatNms = [df.columns[i] for i in pfa_info['pf_from_intersection']]
+    pickedFeatNms = [df.columns[i+1] for i in pfa_info['pf_from_intersection']]
                                 
     return pickedFeatNms, pfa_info
 
